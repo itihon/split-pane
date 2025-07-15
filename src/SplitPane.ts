@@ -96,6 +96,7 @@ export default class SplitPane extends HTMLElement {
 
   private resize(e: PointerEvent) {
     e.preventDefault();
+    e.stopPropagation();
     this.currentResizeEvent = e;
 
     cancelAnimationFrame(this.rAf);
@@ -134,6 +135,7 @@ export default class SplitPane extends HTMLElement {
     this.addEventListener('pointerdown', (e) => {
       if (e.target instanceof Splitter) {
         e.preventDefault();
+        e.stopPropagation();
         this.setPointerCapture(e.pointerId);
 
         this.currentSplitter = e.target;
@@ -148,6 +150,7 @@ export default class SplitPane extends HTMLElement {
     this.addEventListener('pointerup', (e) => {
       if (this.hasPointerCapture(e.pointerId)) {
         e.preventDefault();
+        e.stopPropagation();
         this.releasePointerCapture(e.pointerId);
 
         this.currentSplitter = null;
