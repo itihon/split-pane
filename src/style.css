@@ -1,0 +1,35 @@
+split-pane {
+  display: grid;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  --rows: '';
+  --columns: '';
+  --splitter-width: 1px;
+}
+
+.resizing[type='horizontal'] {
+  cursor: ew-resize;
+}
+
+.resizing[type='vertical'] {
+  cursor: ns-resize;
+}
+
+split-pane[type='horizontal'] {
+  grid-template-columns: var(--columns);
+}
+
+split-pane[type='vertical'] {
+  grid-template-rows: var(--rows);
+}
+
+split-pane[type='horizontal'] > .sp-splitter {
+  width: var(--splitter-width);
+  cursor: ew-resize;
+}
+
+split-pane[type='vertical'] > .sp-splitter {
+  height: var(--splitter-width);
+  cursor: ns-resize;
+}
