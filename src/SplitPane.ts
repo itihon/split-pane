@@ -3,12 +3,9 @@ import './style.css';
 type SplitPaneOrientationType = 'horizontal' | 'vertical';
 
 class Splitter extends HTMLDivElement {
-  idx: number = -1;
-
-  constructor(idx: number) {
+  constructor() {
     super();
     this.classList.add('sp-splitter');
-    this.idx = idx;
   }
 }
 
@@ -21,6 +18,7 @@ export default class SplitPane extends HTMLElement {
   type: SplitPaneOrientationType | null = null;
   rAf: number = 0;
   private currentSplitter: Splitter | null = null;
+  private currentSplitterIdx: number = Infinity;
   private currentResizeEvent: PointerEvent = new PointerEvent('move');
   private cursorCorrection: number = 0;
 
@@ -29,7 +27,7 @@ export default class SplitPane extends HTMLElement {
     const splitter = this.currentSplitter;
 
     if (splitter) {
-      const idx = Number(splitter.idx);
+      const idx = this.currentSplitterIdx;
       const prevPane = splitter.previousElementSibling as HTMLElement;
       const nextPane = splitter.nextElementSibling as HTMLElement;
 
@@ -118,7 +116,7 @@ export default class SplitPane extends HTMLElement {
       const property = this.style.getPropertyValue(types[this.type!]);
 
       if (idx + 1 < childrenLength) {
-        const splitter = new Splitter(idx);
+        const splitter = new Splitter();
         childElement.insertAdjacentElement('afterend', splitter);
         this.style.setProperty(
           types[this.type!],
@@ -136,6 +134,10 @@ export default class SplitPane extends HTMLElement {
         this.setPointerCapture(e.pointerId);
 
         this.currentSplitter = e.target;
+        this.currentSplitterIdx = Array.prototype.indexOf.call(
+          this.querySelectorAll('.sp-splitter'),
+          this.currentSplitter,
+        );
         this.cursorCorrection =
           this.type === 'horizontal' ? e.offsetX : e.offsetY;
 
@@ -151,6 +153,7 @@ export default class SplitPane extends HTMLElement {
         this.releasePointerCapture(e.pointerId);
 
         this.currentSplitter = null;
+        this.currentSplitterIdx = Infinity;
         this.cursorCorrection = 0;
 
         this.removeEventListener('pointermove', this.resize);
