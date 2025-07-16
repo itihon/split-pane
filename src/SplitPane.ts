@@ -18,7 +18,7 @@ const types = {
 };
 
 export default class SplitPane extends HTMLElement {
-  type: SplitPaneOrientationType | null;
+  type: SplitPaneOrientationType | null = null;
   rAf: number = 0;
   private currentSplitter: Splitter | null = null;
   private currentResizeEvent: PointerEvent = new PointerEvent('move');
@@ -103,11 +103,8 @@ export default class SplitPane extends HTMLElement {
     this.rAf = requestAnimationFrame(this.resizeRAF);
   }
 
-  constructor(type: SplitPaneOrientationType | null) {
-    super();
-
-    this.type =
-      type || (this.getAttribute('type') as SplitPaneOrientationType | null);
+  connectedCallback() {
+    this.type = this.getAttribute('type') as SplitPaneOrientationType | null;
 
     if (this.type !== 'horizontal' && this.type !== 'vertical') {
       throw new Error(
@@ -160,6 +157,15 @@ export default class SplitPane extends HTMLElement {
         this.classList.remove('resizing');
       }
     });
+  }
+
+  constructor(type: SplitPaneOrientationType | null) {
+    super();
+
+    if (type) {
+      this.type = type;
+      this.setAttribute('type', type);
+    }
   }
 }
 
