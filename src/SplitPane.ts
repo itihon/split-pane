@@ -9,8 +9,59 @@ class Splitter extends HTMLDivElement {
   }
 }
 
+class GridTemplate {
+  private splitter = '';
+  private parsedTemplate: Array<string> = [];
+
+  constructor(template = '', splitter = 'min-content') {
+    this.splitter = splitter;
+    if (template.trim().length) {
+      this.parsedTemplate = template.split(splitter);
+    }
+  }
+
+  add(idx: number, value = '1fr') {
+    if (idx < 0) {
+      this.parsedTemplate.unshift(value);
+    } else {
+      this.parsedTemplate.splice(idx, 0, value);
+    }
+  }
+
+  remove(idx: number): boolean {
+    if (this.parsedTemplate[idx]) {
+      this.parsedTemplate.splice(idx, 1);
+      return true;
+    }
+    return false;
+  }
+
+  get(idx: number): string | undefined {
+    return this.parsedTemplate[idx];
+  }
+
+  set(idx: number, value = '1fr'): boolean {
+    if (this.parsedTemplate[idx]) {
+      this.parsedTemplate[idx] = value;
+      return true;
+    }
+    return false;
+  }
+
+  parse(template: string, splitter = this.splitter) {
+    if (template.trim().length) {
+      this.parsedTemplate = template.split(splitter);
+    }
+  }
+
+  build(splitter = this.splitter): string {
+    return this.parsedTemplate.join(` ${splitter} `);
+  }
+}
+
 export default class SplitPane extends HTMLElement {
   type: SplitPaneOrientationType | null = null;
+  private gridTemplate: GridTemplate;
   private rAf: number = 0;
   private currentSplitter: Splitter | null = null;
   private currentSplitterIdx: number = Infinity;
@@ -18,7 +69,6 @@ export default class SplitPane extends HTMLElement {
   private cursorCorrection: number = 0;
 
   private resizeRAF = () => {
-    const property = this.style.getPropertyValue('--grid-template');
     const splitter = this.currentSplitter;
 
     if (splitter) {
@@ -70,20 +120,10 @@ export default class SplitPane extends HTMLElement {
       const prevPanePercentage = (prevPaneSize / wholeSize) * 100;
       const nextPanePercentage = (nextPaneSize / wholeSize) * 100;
 
-      const newProperty = property
-        .split(' min-content ')
-        .map((value, index) => {
-          if (index === idx) {
-            return `${prevPanePercentage}%`;
-          } else if (index === idx + 1) {
-            return `${nextPanePercentage}%`;
-          }
+      this.gridTemplate.set(idx, `${prevPanePercentage}%`);
+      this.gridTemplate.set(idx + 1, `${nextPanePercentage}%`);
 
-          return value;
-        })
-        .join(' min-content ');
-
-      this.style.setProperty('--grid-template', newProperty);
+      this.style.setProperty('--grid-template', this.gridTemplate.build());
     }
   };
 
@@ -106,21 +146,22 @@ export default class SplitPane extends HTMLElement {
     }
 
     const childrenLength = this.children.length;
+    const property = this.style.getPropertyValue('--grid-template');
+
+    this.gridTemplate.parse(property);
 
     [...this.children].forEach((childElement, idx) => {
-      const property = this.style.getPropertyValue('--grid-template');
+      if (!this.gridTemplate.get(idx)) {
+        this.gridTemplate.add(idx);
+      }
 
       if (idx + 1 < childrenLength) {
         const splitter = new Splitter();
         childElement.insertAdjacentElement('afterend', splitter);
-        this.style.setProperty(
-          '--grid-template',
-          `${property} 1fr min-content`,
-        );
-      } else {
-        this.style.setProperty('--grid-template', `${property} 1fr`);
       }
     });
+
+    this.style.setProperty('--grid-template', this.gridTemplate.build());
 
     this.addEventListener('pointerdown', (e) => {
       if (e.target instanceof Splitter) {
@@ -157,8 +198,9 @@ export default class SplitPane extends HTMLElement {
     });
   }
 
-  constructor(type: SplitPaneOrientationType | null) {
+  constructor(type: SplitPaneOrientationType | null, template = '') {
     super();
+    this.gridTemplate = new GridTemplate(template);
 
     if (type) {
       this.type = type;
@@ -197,22 +239,15 @@ export default class SplitPane extends HTMLElement {
         }
       }
 
-      const newGridTemplate = this.style
-        .getPropertyValue('--grid-template')
-        .split(' min-content ')
-        .filter((_, index) => index !== idx)
-        .map((size, index) => {
-          if (nextPane && index === idx) {
-            return '1fr';
-          }
-          if (prevPane && index === idx - 1) {
-            return '1fr';
-          }
-          return size;
-        })
-        .join(' min-content ');
+      this.gridTemplate.remove(idx);
 
-      this.style.setProperty('--grid-template', newGridTemplate);
+      if (nextPane) {
+        this.gridTemplate.set(idx);
+      } else if (prevPane) {
+        this.gridTemplate.set(idx - 1);
+      }
+
+      this.style.setProperty('--grid-template', this.gridTemplate.build());
 
       pane.remove();
       return true;
