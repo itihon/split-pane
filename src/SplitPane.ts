@@ -182,6 +182,49 @@ export default class SplitPane extends HTMLElement {
   getAllPanes(): NodeListOf<HTMLElement> {
     return this.querySelectorAll(':not(.sp-splitter)');
   }
+
+  removePane(idx: number): boolean {
+    const panes = this.getAllPanes();
+    const prevPane = panes.item(idx - 1);
+    const pane = panes.item(idx);
+    const nextPane = panes.item(idx + 1);
+
+    if (pane) {
+      const prevSplitter = pane.previousElementSibling as Splitter | null;
+
+      if (prevSplitter) {
+        prevSplitter.remove();
+      } else {
+        const nextSplitter = pane.nextElementSibling as Splitter | null;
+
+        if (nextSplitter) {
+          nextSplitter.remove();
+        }
+      }
+
+      const newGridTemplate = this.style
+        .getPropertyValue(types[this.type!])
+        .split(' min-content ')
+        .filter((_, index) => index !== idx)
+        .map((size, index) => {
+          if (nextPane && index === idx) {
+            return '1fr';
+          }
+          if (prevPane && index === idx - 1) {
+            return '1fr';
+          }
+          return size;
+        })
+        .join(' min-content ');
+
+      this.style.setProperty(types[this.type!], newGridTemplate);
+
+      pane.remove();
+      return true;
+    }
+
+    return false;
+  }
 }
 
 customElements.define('sp-splitter', Splitter, { extends: 'div' });
