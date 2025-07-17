@@ -11,7 +11,7 @@ class Splitter extends HTMLDivElement {
 
 export default class SplitPane extends HTMLElement {
   type: SplitPaneOrientationType | null = null;
-  rAf: number = 0;
+  private rAf: number = 0;
   private currentSplitter: Splitter | null = null;
   private currentSplitterIdx: number = Infinity;
   private currentResizeEvent: PointerEvent = new PointerEvent('move');
