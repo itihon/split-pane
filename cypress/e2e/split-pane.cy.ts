@@ -60,7 +60,15 @@ describe('split-pane component', () => {
           expect(panes[3]).eq(undefined);
         });
     });
-
+    
+    it('tests length property', () => {
+      cy
+        .get('split-pane')
+        .then(({ 0: splitPane }) => {
+          expect((splitPane as SplitPane).length).eq(3);
+        });
+    });
+    
   });
 
 });
