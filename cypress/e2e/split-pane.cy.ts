@@ -46,6 +46,20 @@ describe('split-pane component', () => {
           expect(splitPane.getPane(3)).eq(null);
         });
     });
+    
+    it('tests getAllPanes method', () => {
+      cy
+        .get('split-pane')
+        .then((res) => {
+          const splitPane = res[0] as SplitPane;
+          const panes = splitPane.getAllPanes();
+
+          expect(panes[0].textContent).eq('Content area 1');
+          expect(panes[1].textContent).eq('Content area 2');
+          expect(panes[2].textContent).eq('Content area 3');
+          expect(panes[3]).eq(undefined);
+        });
+    });
 
   });
 
