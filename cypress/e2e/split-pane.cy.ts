@@ -19,6 +19,11 @@ function createSplitPane(direction: SplitPaneOrientationType, panesCount: number
   return splitPane;
 }
 
+const removeAllSplitPanes = (document: Document) =>
+  document
+    .querySelectorAll('split-pane')
+    .forEach(splitPane => splitPane.remove());
+
 describe('split-pane component', () => {
 
   describe('API', () => {
