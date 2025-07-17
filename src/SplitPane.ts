@@ -9,11 +9,6 @@ class Splitter extends HTMLDivElement {
   }
 }
 
-const types = {
-  horizontal: '--columns',
-  vertical: '--rows',
-};
-
 export default class SplitPane extends HTMLElement {
   type: SplitPaneOrientationType | null = null;
   rAf: number = 0;
@@ -23,7 +18,7 @@ export default class SplitPane extends HTMLElement {
   private cursorCorrection: number = 0;
 
   private resizeRAF = () => {
-    const property = this.style.getPropertyValue(types[this.type!]);
+    const property = this.style.getPropertyValue('--grid-template');
     const splitter = this.currentSplitter;
 
     if (splitter) {
@@ -88,7 +83,7 @@ export default class SplitPane extends HTMLElement {
         })
         .join(' min-content ');
 
-      this.style.setProperty(types[this.type!], newProperty);
+      this.style.setProperty('--grid-template', newProperty);
     }
   };
 
@@ -113,17 +108,17 @@ export default class SplitPane extends HTMLElement {
     const childrenLength = this.children.length;
 
     [...this.children].forEach((childElement, idx) => {
-      const property = this.style.getPropertyValue(types[this.type!]);
+      const property = this.style.getPropertyValue('--grid-template');
 
       if (idx + 1 < childrenLength) {
         const splitter = new Splitter();
         childElement.insertAdjacentElement('afterend', splitter);
         this.style.setProperty(
-          types[this.type!],
+          '--grid-template',
           `${property} 1fr min-content`,
         );
       } else {
-        this.style.setProperty(types[this.type!], `${property} 1fr`);
+        this.style.setProperty('--grid-template', `${property} 1fr`);
       }
     });
 
@@ -203,7 +198,7 @@ export default class SplitPane extends HTMLElement {
       }
 
       const newGridTemplate = this.style
-        .getPropertyValue(types[this.type!])
+        .getPropertyValue('--grid-template')
         .split(' min-content ')
         .filter((_, index) => index !== idx)
         .map((size, index) => {
@@ -217,7 +212,7 @@ export default class SplitPane extends HTMLElement {
         })
         .join(' min-content ');
 
-      this.style.setProperty(types[this.type!], newGridTemplate);
+      this.style.setProperty('--grid-template', newGridTemplate);
 
       pane.remove();
       return true;
