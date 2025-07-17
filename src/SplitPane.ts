@@ -220,6 +220,42 @@ export default class SplitPane extends HTMLElement {
     return this.querySelectorAll(':not(.sp-splitter)');
   }
 
+  addPane(container: HTMLElement, idx = Infinity) {
+    const panes = this.getAllPanes();
+    const splitter = new Splitter();
+
+    this.gridTemplate.add(idx);
+    this.style.setProperty('--grid-template', this.gridTemplate.build());
+
+    if (idx < 0) {
+      this.insertAdjacentElement('afterbegin', container);
+
+      if (panes.length) {
+        container.insertAdjacentElement('afterend', splitter);
+      }
+
+      return;
+    }
+
+    if (idx < panes.length) {
+      const pane = panes[idx];
+      pane.insertAdjacentElement('beforebegin', container);
+      pane.insertAdjacentElement('beforebegin', splitter);
+
+      return;
+    }
+
+    if (idx >= panes.length) {
+      if (panes.length) {
+        this.appendChild(splitter);
+      }
+
+      this.appendChild(container);
+
+      return;
+    }
+  }
+
   removePane(idx: number): boolean {
     const panes = this.getAllPanes();
     const prevPane = panes.item(idx - 1);
