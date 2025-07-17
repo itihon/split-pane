@@ -271,6 +271,92 @@ describe('split-pane component', () => {
       cy.document().then(testRemovePanesMiddle('vertical'));
     });
 
+    it('tests addPane method', () => {
+      cy.document().then(removeAllSplitPanes);
+
+      cy.document().then(document => {
+        let splitPane;
+        
+        // length 0: no idx, idx < 0, idx === 0, idx > 0
+        splitPane = new SplitPane('horizontal');
+        document.body.appendChild(splitPane);
+
+        const div = document.createElement('div');
+        div.append('Inserted pane');
+
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('');
+        splitPane.addPane(div);
+        expect(splitPane.length).eq(1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(0);
+        expect(splitPane.getPane(0)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr');
+        splitPane.removePane(0);
+
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('');
+        splitPane.addPane(div, -1);
+        expect(splitPane.length).eq(1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(0);
+        expect(splitPane.getPane(0)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr');
+        splitPane.removePane(0);
+        
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('');
+        splitPane.addPane(div, 0);
+        expect(splitPane.length).eq(1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(0);
+        expect(splitPane.getPane(0)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr');
+        splitPane.removePane(0);
+        
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('');
+        splitPane.addPane(div, 10);
+        expect(splitPane.length).eq(1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(0);
+        expect(splitPane.getPane(0)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr');
+        splitPane.removePane(0);
+
+        removeAllSplitPanes(document);
+
+        // length > 0: no idx, idx < 0, idx < length, idx >= length 
+        const count = 3;
+        splitPane = createSplitPane('horizontal', count);
+        document.body.appendChild(splitPane);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(count - 1);
+        
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr');
+        splitPane.addPane(div);
+        expect(splitPane.length).eq(count + 1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(count);
+        expect(splitPane.getPane(splitPane.length - 1)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr min-content 1fr');
+        splitPane.removePane(splitPane.length - 1);
+
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr');
+        splitPane.addPane(div, -1);
+        expect(splitPane.length).eq(count + 1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(count);
+        expect(splitPane.getPane(0)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr min-content 1fr');
+        splitPane.removePane(0);
+        
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr');
+        splitPane.addPane(div, count - 1);
+        expect(splitPane.length).eq(count + 1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(count);
+        expect(splitPane.getPane(count - 1)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr min-content 1fr');
+        splitPane.removePane(count - 1);
+        
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr');
+        splitPane.addPane(div, count);
+        expect(splitPane.length).eq(count + 1);
+        expect(splitPane.querySelectorAll('.sp-splitter').length).eq(count);
+        expect(splitPane.getPane(splitPane.length - 1)).eq(div);
+        expect(splitPane.style.getPropertyValue('--grid-template')).eq('1fr min-content 1fr min-content 1fr min-content 1fr');
+        splitPane.removePane(splitPane.length - 1);
+      });
+    });
   });
 
 });
