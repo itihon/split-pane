@@ -170,6 +170,10 @@ export default class SplitPane extends HTMLElement {
       this.setAttribute('type', type);
     }
   }
+
+  get length(): number {
+    return this.getAllPanes().length;
+  }
 }
 
 customElements.define('sp-splitter', Splitter, { extends: 'div' });
