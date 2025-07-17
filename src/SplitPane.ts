@@ -1,6 +1,6 @@
 import './style.css';
 
-type SplitPaneOrientationType = 'horizontal' | 'vertical';
+export type SplitPaneOrientationType = 'horizontal' | 'vertical';
 
 class Splitter extends HTMLDivElement {
   constructor() {
