@@ -1,8 +1,23 @@
 import SplitPane from '../../src/index';
+import type { SplitPaneOrientationType } from '../../src/SplitPane';
 
 const visitLocalhost = () => {
   cy.visit('localhost:5173');
 };
+
+function createSplitPane(direction: SplitPaneOrientationType, panesCount: number):SplitPane {
+
+  const splitPane = new SplitPane(direction);
+
+  splitPane.append(
+    ...Array
+      .from({ length: panesCount })
+      .map(() => document.createElement('div'))
+      .map((div, idx) => (div.append(`Content area ${idx + 1}`), div))
+  );
+  
+  return splitPane;
+}
 
 describe('split-pane component', () => {
 
@@ -11,28 +26,9 @@ describe('split-pane component', () => {
       visitLocalhost();
 
       cy.document().then(document => {
-        const splitPaneH = new SplitPane('horizontal');
-        const splitPaneV = new SplitPane('vertical');
-        const div1 = document.createElement('div');
-        const div2 = document.createElement('div');
-        const div3 = document.createElement('div');
-        const div4 = document.createElement('div');
-        const div5 = document.createElement('div');
-        const div6 = document.createElement('div');
-
-        div1.append('Content area 1');
-        div2.append('Content area 2');
-        div3.append('Content area 3');
-        div4.append('Content area 4');
-        div5.append('Content area 5');
-        div6.append('Content area 6');
-
-        splitPaneH.append(div1, div2, div3);
-        splitPaneV.append(div4, div5, div6);
-
-        document.body.append(splitPaneH, splitPaneV);
+        document.body.appendChild(createSplitPane('horizontal', 3));
       });
-    })
+    });
 
     it('tests getPane method', () => {
       cy
