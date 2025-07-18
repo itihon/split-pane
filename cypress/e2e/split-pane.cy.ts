@@ -10,11 +10,19 @@ function createSplitPane(direction: SplitPaneOrientationType, panesCount: number
 
   const splitPane = new SplitPane(direction);
 
+  splitPane.style.width = '900px';
+  splitPane.style.height = '600px';
+
   splitPane.append(
     ...Array
       .from({ length: panesCount })
       .map(() => document.createElement('div'))
       .map((div, idx) => (div.append(`Content area ${idx + 1}`), div))
+      .map(div => { 
+        div.style.width = '100%';
+        div.style.height = '100%';
+        return div;
+      })
   );
   
   return splitPane;
