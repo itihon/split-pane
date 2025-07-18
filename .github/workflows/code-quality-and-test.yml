@@ -101,7 +101,7 @@ jobs:
           # build: npm run build # This can also be used if your build is part of Cypress action
           # start: npm run start # This can also be used if your start is part of Cypress action
           # wait-on: 'http://localhost:3000' # This can also be used if your wait-on is part of Cypress action
-          spec: cypress/e2e/file-tree-view/*.cy.js
+          spec: cypress/e2e/*.cy.ts
           start: npm run dev
           wait-on: 'http://localhost:5173'
           wait-on-timeout: 120
