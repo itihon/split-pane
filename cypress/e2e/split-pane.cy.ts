@@ -1,5 +1,6 @@
 import SplitPane from '../../src/index';
 import type { SplitPaneOrientationType } from '../../src/SplitPane';
+import SplitPaneStateChangeEvent from '../../src/SplitPaneStateChangeEvent';
 
 const visitLocalhost = () => {
   cy.visit('localhost:5173');
@@ -359,4 +360,106 @@ describe('split-pane component', () => {
     });
   });
 
+  describe('events', () => {
+    it('should fire state change event on add pane', () => {
+      cy.document().then(removeAllSplitPanes);
+
+      cy.document().then(document => {
+        const splitPane = createSplitPane('horizontal', 2);
+        document.body.appendChild(splitPane);
+      });
+
+      cy.get('split-pane').then(res => {
+        const splitPane = res[0] as SplitPane;
+        const div = document.createElement('div');
+        const panes = splitPane.getAllPanes();
+
+        splitPane.addEventListener('statechange', (event) => {
+          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+
+          expect(kind).eq('addpane');
+
+          expect(oldState.gridTemplate).eq('1fr min-content 1fr');
+          expect(newState.gridTemplate).eq('1fr min-content 1fr min-content 1fr');
+
+          expect([...oldState.panes]).deep.eq([...panes]);
+          expect([...newState.panes]).deep.eq([panes[0], div, panes[1]]);
+        });
+
+        splitPane.addPane(div, 1);
+      });
+    });
+    
+    it('should fire state change event on remove pane', () => {
+      cy.document().then(removeAllSplitPanes);
+
+      cy.document().then(document => {
+        const splitPane = createSplitPane('horizontal', 3);
+        document.body.appendChild(splitPane);
+      });
+
+      cy.get('split-pane').then(res => {
+        const splitPane = res[0] as SplitPane;
+        const panes = splitPane.getAllPanes();
+
+        splitPane.addEventListener('statechange', (event) => {
+          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+
+          expect(kind).eq('removepane');
+
+          expect(oldState.gridTemplate).eq('1fr min-content 1fr min-content 1fr');
+          expect(newState.gridTemplate).eq('1fr min-content 1fr');
+
+          expect([...oldState.panes]).deep.eq([...panes]);
+          expect([...newState.panes]).deep.eq([panes[0], panes[2]]);
+        });
+
+        splitPane.removePane(1);
+      });
+    });
+    
+    it('should fire state change event on resize', () => {
+      cy.document().then(removeAllSplitPanes);
+
+      cy.document().then(document => {
+        const splitPane = createSplitPane('horizontal', 3);
+        document.body.appendChild(splitPane);
+      });
+
+      cy.get('split-pane').then(res => {
+        const splitPane = res[0] as SplitPane;
+        const panes = splitPane.getAllPanes();
+
+        splitPane.addEventListener('statechange', (event) => {
+          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+          
+          const wholeWidth = splitPane.offsetWidth;
+          const firstPaneWidth = panes[0].offsetWidth;
+          const secondPaneWidth = panes[1].offsetWidth;
+
+          const firstPanePercentage = firstPaneWidth / wholeWidth * 100;
+          const secondPanePercentage = secondPaneWidth / wholeWidth * 100;
+
+          expect(kind).eq('resizepane');
+
+          expect(oldState.gridTemplate).eq('1fr min-content 1fr min-content 1fr');
+          expect(newState.gridTemplate).eq(`${firstPanePercentage}% min-content ${secondPanePercentage}% min-content 1fr`);
+
+          expect([...oldState.panes]).deep.eq([...panes]);
+          expect([...newState.panes]).deep.eq([...panes]);
+        });
+
+        cy
+        .get('split-pane')
+        .get('.sp-splitter')
+        .first()
+        .trigger('pointerdown', { pointerId: 1, offsetX: 0 })
+        .trigger('pointermove', { pointerId:1, offsetX: 150 })
+        .trigger('pointerup', { pointerId: 1, offsetX: 150})
+      });
+
+
+    });
+  });
+  
 });
