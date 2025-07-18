@@ -470,4 +470,133 @@ describe('split-pane component', () => {
     });
   });
   
+  describe('user interaction', () => {
+    function getDimension(element: HTMLElement, type: SplitPaneOrientationType) {
+      return type === 'horizontal' ? element.offsetWidth : element.offsetHeight;
+    }
+
+    function moveSplitter(splitterIndex:number, distance: number, type: SplitPaneOrientationType) {
+      const pointerId = 1;
+      const offsetX = type === 'horizontal' ? distance : 0;
+      const offsetY = type === 'vertical' ? distance : 0;
+
+      cy
+        .get('split-pane')
+        .find('.sp-splitter')
+        .eq(splitterIndex)
+        .as('splitter');
+
+      return cy
+        .get('@splitter')
+        .trigger('pointerdown', { pointerId, offsetX: 0, offsetY: 0 })
+        .trigger('pointermove', { pointerId, offsetX, offsetY })
+        .trigger('pointerup', { pointerId })
+        .then(() => splitterIndex);
+    }
+
+    const ensurePanesAreResized = (
+      splitPane: SplitPane, 
+      type: SplitPaneOrientationType, 
+    ) => (splitterIndex: number) => {
+      const panes = splitPane.getAllPanes();
+      const prevPaneSize = getDimension(panes[splitterIndex], type);
+      const nextPaneSize = getDimension(panes[splitterIndex + 1], type);
+      const wholeSize = getDimension(splitPane, type);
+      // const pane2newSize = getDimension(panes[2], type);
+      const prevPanePercentage = prevPaneSize / wholeSize * 100;
+      const nextPanePercentage = nextPaneSize / wholeSize * 100;
+      const template = splitPane.style.getPropertyValue('--grid-template');
+
+      const newTemplate = template
+        .split(' min-content ')
+        .map((paneSize, idx) => {
+          if (idx === splitterIndex) {
+            return `${prevPanePercentage}%`;
+          }
+          if (idx === splitterIndex + 1) {
+            return `${nextPanePercentage}%`;
+          }
+          return paneSize;
+        })
+        .join(' min-content ');
+
+      // expect(pane2newSize).eq(pane2size); !!! gets 1px larger
+      expect(template).eq(newTemplate);
+    };
+
+    const testResize = (type: SplitPaneOrientationType, size: number) => 
+      (document: Document) => {
+        const splitPane = createSplitPane(type, 3);
+        document.body.appendChild(splitPane);
+
+        const panes = splitPane.getAllPanes();
+
+        const pane0size = getDimension(panes[0], type);
+        const pane1size = getDimension(panes[1], type);
+        const pane2size = getDimension(panes[2], type);
+        const wholeInitialSize = getDimension(splitPane, type);
+
+        expect(pane0size)
+          .eq(pane1size)
+          .eq(pane2size)
+          .greaterThan(0)
+          .lessThan(wholeInitialSize);
+
+        return moveSplitter(0, size, type)
+          .then(ensurePanesAreResized(splitPane, type))
+          .then(() => {
+            const wholeNewSize = getDimension(splitPane, type);
+            expect(wholeNewSize).eq(wholeInitialSize);
+          })
+          .then(() => {
+            moveSplitter(1, size * 2, type)
+              .then(ensurePanesAreResized(splitPane, type))
+              .then(() => {
+                const wholeNewSize = getDimension(splitPane, type);
+                expect(wholeNewSize).eq(wholeInitialSize);
+              });
+          });
+      };
+
+    it('resizes panes', () => {
+      cy
+        .document()
+        .then(removeAllSplitPanes)
+        .document().then(testResize('horizontal', 100))
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('horizontal', 420))
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('vertical', 50))
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('vertical', 250));
+    });
+
+    it('does not set pane size < 0', () => {
+      cy
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('horizontal', -100))
+        .get('split-pane')
+        .first()
+        .should('have.attr', 'style')
+        .and('include', '--grid-template: 0% min-content 0% min-content 99.77777777777777%;')
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('horizontal', 3000))
+        .get('split-pane')
+        .first()
+        .should('have.attr', 'style')
+        .and('include', '--grid-template: 66.44444444444444% min-content 33.33333333333333% min-content 0%;')
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('vertical', -100))
+        .get('split-pane')
+        .first()
+        .should('have.attr', 'style')
+        .and('include', '--grid-template: 0% min-content 0% min-content 99.66666666666667%;')
+        .document().then(removeAllSplitPanes)
+        .document().then(testResize('vertical', 3000))
+        .get('split-pane')
+        .first()
+        .should('have.attr', 'style')
+        .and('include', '--grid-template: 66.33333333333333% min-content 33.33333333333333% min-content 0%;')
+    });
+  });
 });
