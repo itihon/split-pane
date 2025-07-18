@@ -1,4 +1,6 @@
 import GridTemplate from './GridTemplate';
+import SplitPaneStateChangeEvent from './SplitPaneStateChangeEvent';
+import type { SplitPaneState } from './SplitPaneStateChangeEvent';
 import './style.css';
 
 export type SplitPaneOrientationType = 'horizontal' | 'vertical';
@@ -26,6 +28,7 @@ export default class SplitPane extends HTMLElement {
       const idx = this.currentSplitterIdx;
       const prevPane = splitter.previousElementSibling as HTMLElement;
       const nextPane = splitter.nextElementSibling as HTMLElement;
+      const oldState = this.getState();
 
       let prevPaneSize = 0;
       let nextPaneSize = 0;
@@ -75,6 +78,10 @@ export default class SplitPane extends HTMLElement {
       this.gridTemplate.set(idx + 1, `${nextPanePercentage}%`);
 
       this.style.setProperty('--grid-template', this.gridTemplate.build());
+
+      this.dispatchEvent(
+        new SplitPaneStateChangeEvent('resizepane', oldState, this.getState()),
+      );
     }
   };
 
@@ -174,6 +181,7 @@ export default class SplitPane extends HTMLElement {
   addPane(container: HTMLElement, idx = Infinity) {
     const panes = this.getAllPanes();
     const splitter = new Splitter();
+    const oldState = this.getState();
 
     this.gridTemplate.add(idx);
     this.style.setProperty('--grid-template', this.gridTemplate.build());
@@ -184,27 +192,21 @@ export default class SplitPane extends HTMLElement {
       if (panes.length) {
         container.insertAdjacentElement('afterend', splitter);
       }
-
-      return;
-    }
-
-    if (idx < panes.length) {
+    } else if (idx < panes.length) {
       const pane = panes[idx];
       pane.insertAdjacentElement('beforebegin', container);
       pane.insertAdjacentElement('beforebegin', splitter);
-
-      return;
-    }
-
-    if (idx >= panes.length) {
+    } else if (idx >= panes.length) {
       if (panes.length) {
         this.appendChild(splitter);
       }
 
       this.appendChild(container);
-
-      return;
     }
+
+    this.dispatchEvent(
+      new SplitPaneStateChangeEvent('addpane', oldState, this.getState()),
+    );
   }
 
   removePane(idx: number): boolean {
@@ -215,6 +217,7 @@ export default class SplitPane extends HTMLElement {
 
     if (pane) {
       const prevSplitter = pane.previousElementSibling as Splitter | null;
+      const oldState = this.getState();
 
       if (prevSplitter) {
         prevSplitter.remove();
@@ -237,10 +240,22 @@ export default class SplitPane extends HTMLElement {
       this.style.setProperty('--grid-template', this.gridTemplate.build());
 
       pane.remove();
+
+      this.dispatchEvent(
+        new SplitPaneStateChangeEvent('removepane', oldState, this.getState()),
+      );
+
       return true;
     }
 
     return false;
+  }
+
+  getState(): SplitPaneState {
+    return {
+      gridTemplate: this.style.getPropertyValue('--grid-template'),
+      panes: this.getAllPanes(),
+    };
   }
 }
 
