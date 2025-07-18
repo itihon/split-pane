@@ -1,6 +1,6 @@
 {
   "name": "@itihon/split-pane",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Split pane component based on Web Components API",
   "homepage": "https://itihon.github.io/split-pane/",
   "keywords": [
