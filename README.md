@@ -11,7 +11,7 @@
 [Code Coverage]: https://codecov.io/gh/itihon/split-pane/branch/master/graph/badge.svg
 [semantic-release]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
 
-> Split pane web component.
+Split pane web component. Changes percentage for adjacent panes in CSS `grid-template-columns`/`grid-template-rows` when divider is being dragged by the user.
 
 ## 🕑 Developing...
 
@@ -44,7 +44,18 @@ import splitPane from 'split-pane'
   <div>pane 2</div>
   <div>pane 3</div>
 </split-pane>
+
+<!-- nested --->
+<split-pane type="horizontal">
+  <div>pane 1</div>
+  <split-pane type="vertical">
+    <div>pane 2</div>
+    <div>pane 3</div>
+  </split-pane>
+</split-pane>
 ```
+
+> Do not add or remove child elements directly after an instance of component was mounted. Use `addPane()` and `removePane()` API methods instead.
 
 ### In JS or TS
 
@@ -62,6 +73,51 @@ document.body.append(splitPane);
 
 ``` js
 const splitPane = document.getElementById('split-pane-1');
+```
+
+#### API 
+
+```ts
+export default class SplitPane extends HTMLElement {
+  get length(): number;
+  getPane(idx: number): HTMLElement | null;
+  getAllPanes(): NodeListOf<HTMLElement>;
+  addPane(container: HTMLElement, idx?: number): void;
+  removePane(idx: number): boolean;
+  getState(): SplitPaneState;
+}
+```
+
+#### Events
+
+```ts 
+export type SplitPaneState = {
+    gridTemplate: string;
+    panes: NodeListOf<HTMLElement>;
+};
+
+type SplitPaneChangeStateKind = 'addpane' | 'removepane' | 'resizepane';
+
+export default class SplitPaneStateChangeEvent extends Event {
+  oldState: SplitPaneState;
+  newState: SplitPaneState;
+  kind: SplitPaneChangeStateKind;
+}
+```
+
+```js
+import SplitPane from "@itihon/split-pane";
+
+const splitPane = new SplitPane();
+
+document.body.append(splitPane);
+
+splitPane.addEventListener('statechange', event => {
+  const { oldState, newState, kind, target } = event;
+  // ...
+  // ...
+});
+
 ```
 
 ## Related
