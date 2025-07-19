@@ -96,12 +96,12 @@ export type SplitPaneState = {
     panes: NodeListOf<HTMLElement>;
 };
 
-type SplitPaneChangeStateKind = 'addpane' | 'removepane' | 'resizepane';
+type SplitPaneStateChangeKind = 'addpane' | 'removepane' | 'resizepane';
 
 export default class SplitPaneStateChangeEvent extends Event {
   oldState: SplitPaneState;
   newState: SplitPaneState;
-  kind: SplitPaneChangeStateKind;
+  kind: SplitPaneStateChangeKind;
 }
 ```
 
