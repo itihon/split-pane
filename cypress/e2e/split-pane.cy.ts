@@ -461,12 +461,10 @@ describe('split-pane component', () => {
         .get('split-pane')
         .get('.sp-splitter')
         .first()
-        .trigger('pointerdown', { pointerId: 1, offsetX: 0 })
-        .trigger('pointermove', { pointerId:1, offsetX: 150 })
-        .trigger('pointerup', { pointerId: 1, offsetX: 150})
+        .trigger('pointerdown', { pointerId: 1, offsetX: 0, force: true })
+        .trigger('pointermove', { pointerId:1, offsetX: 150, force: true })
+        .trigger('pointerup', { pointerId: 1, offsetX: 150, force: true });
       });
-
-
     });
   });
   
