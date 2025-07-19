@@ -5,7 +5,7 @@
 [![Code Coverage]](https://codecov.io/gh/itihon/split-pane)
 [![semantic-release]](https://github.com/semantic-release/semantic-release)
 
-[License]: https://img.shields.io/badge/License-ISC-blue.svg
+[License]: https://img.shields.io/badge/License-MIT-blue.svg
 [Build Status]: https://github.com/itihon/split-pane/actions/workflows/code-quality-and-test.yml/badge.svg
 [NPM Package]: https://img.shields.io/npm/v/split-pane.svg
 [Code Coverage]: https://codecov.io/gh/itihon/split-pane/branch/master/graph/badge.svg
