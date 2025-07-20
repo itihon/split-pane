@@ -486,9 +486,9 @@ describe('split-pane component', () => {
 
       return cy
         .get('@splitter')
-        .trigger('pointerdown', { pointerId, offsetX: 0, offsetY: 0 })
-        .trigger('pointermove', { pointerId, offsetX, offsetY })
-        .trigger('pointerup', { pointerId })
+        .trigger('pointerdown', { pointerId, offsetX: 0, offsetY: 0, force: true })
+        .trigger('pointermove', { pointerId, offsetX, offsetY, force: true })
+        .trigger('pointerup', { pointerId, force: true })
         .then(() => splitterIndex);
     }
 
@@ -541,6 +541,7 @@ describe('split-pane component', () => {
           .lessThan(wholeInitialSize);
 
         return moveSplitter(0, size, type)
+          .wait(10)
           .then(ensurePanesAreResized(splitPane, type))
           .then(() => {
             const wholeNewSize = getDimension(splitPane, type);
@@ -548,6 +549,7 @@ describe('split-pane component', () => {
           })
           .then(() => {
             moveSplitter(1, size * 2, type)
+              .wait(10)
               .then(ensurePanesAreResized(splitPane, type))
               .then(() => {
                 const wholeNewSize = getDimension(splitPane, type);
