@@ -651,5 +651,52 @@ describe('split-pane component', () => {
         .should('have.attr', 'style')
         .and('include', '--grid-template: 66.33333333333333% min-content 33.33333333333333% min-content 0%;')
     });
+
+    it('resizes panes with nested split pane components', () => {
+      cy
+        .document().then(removeAllSplitPanes)
+        .document().then(document => {
+          const splitPaneH = createSplitPane('horizontal', 2);
+          const splitPaneV = createSplitPane('vertical', 3 , { width: '100%', height: '100%' });
+
+          document.body.appendChild(splitPaneH);
+          splitPaneH.addPane(splitPaneV, 1);
+
+          cy  
+            .then(() => moveSplitter(splitPaneH, 0, 500, 'horizontal')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneH, 'horizontal'))
+            )
+            .then(() => moveSplitter(splitPaneH, 0, 100, 'horizontal')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneH, 'horizontal'))
+            )
+            .then(() => moveSplitter(splitPaneH, 1, 200, 'horizontal')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneH, 'horizontal'))
+            )
+            .then(() => moveSplitter(splitPaneH, 1, 700, 'horizontal')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneH, 'horizontal'))
+            )
+            .then(() => moveSplitter(splitPaneV, 0, 370, 'vertical')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneV, 'vertical'))
+            )
+            .then(() => moveSplitter(splitPaneV, 0, 30, 'vertical')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneV, 'vertical'))
+            )
+            .then(() => moveSplitter(splitPaneV, 1, 50, 'vertical')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneV, 'vertical'))
+            )
+            .then(() => moveSplitter(splitPaneV, 1, 500, 'vertical')
+              .wait(10)
+              .then(ensurePanesAreResized(splitPaneV, 'vertical'))
+            );
+        });
+
+    });
   });
 });
