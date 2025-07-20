@@ -175,7 +175,7 @@ export default class SplitPane extends HTMLElement {
   }
 
   getAllPanes(): NodeListOf<HTMLElement> {
-    return this.querySelectorAll(':not(.sp-splitter)');
+    return this.querySelectorAll(':scope > :not(.sp-splitter)');
   }
 
   addPane(container: HTMLElement, idx = Infinity) {
