@@ -108,14 +108,22 @@ export default class SplitPane extends HTMLElement {
 
     this.gridTemplate.parse(property);
 
-    [...this.children].forEach((childElement, idx) => {
+    [...this.children].forEach((childElement, idx, children) => {
       if (!this.gridTemplate.get(idx)) {
         this.gridTemplate.add(idx);
       }
 
       if (idx + 1 < childrenLength) {
-        const splitter = new Splitter();
-        childElement.insertAdjacentElement('afterend', splitter);
+        const nextChildElement = children[idx + 1];
+
+        if (
+          !(childElement instanceof Splitter) &&
+          nextChildElement &&
+          !(nextChildElement instanceof Splitter)
+        ) {
+          const splitter = new Splitter();
+          childElement.insertAdjacentElement('afterend', splitter);
+        }
       }
     });
 
