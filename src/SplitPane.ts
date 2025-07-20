@@ -137,7 +137,7 @@ export default class SplitPane extends HTMLElement {
 
         this.currentSplitter = e.target;
         this.currentSplitterIdx = Array.prototype.indexOf.call(
-          this.querySelectorAll('.sp-splitter'),
+          this.querySelectorAll(':scope > .sp-splitter'),
           this.currentSplitter,
         );
         this.cursorCorrection =
