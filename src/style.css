@@ -25,10 +25,31 @@ split-pane[type='vertical'] {
 
 split-pane[type='horizontal'] > .sp-splitter {
   width: var(--splitter-width);
+  height: 100%;
   cursor: ew-resize;
 }
 
 split-pane[type='vertical'] > .sp-splitter {
+  width: 100%;
   height: var(--splitter-width);
   cursor: ns-resize;
+}
+
+.sp-splitter::after {
+  content: '';
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+split-pane[type='horizontal'] > .sp-splitter::after {
+  width: calc(var(--splitter-width) + 2px);
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+split-pane[type='vertical'] > .sp-splitter::after {
+  width: 100%;
+  height: calc(var(--splitter-width) + 2px);
+  transform: translateY(-50%);
 }
