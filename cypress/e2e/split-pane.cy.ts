@@ -526,15 +526,17 @@ describe('split-pane component', () => {
       return type === 'horizontal' ? element.offsetWidth : element.offsetHeight;
     }
 
-    function moveSplitter(splitterIndex:number, distance: number, type: SplitPaneOrientationType) {
+    function moveSplitter(splitPane: SplitPane, splitterIndex:number, distance: number, type: SplitPaneOrientationType) {
       const pointerId = 1;
       const offsetX = type === 'horizontal' ? distance : 0;
       const offsetY = type === 'vertical' ? distance : 0;
 
       cy
         .get('split-pane')
-        .find('.sp-splitter')
-        .eq(splitterIndex)
+        .filter((_, el) => el === splitPane)
+        .children()
+        .filter((_, el) => el.classList.contains('sp-splitter'))
+        .filter((idx) => idx === splitterIndex)
         .as('splitter');
 
       return cy
@@ -593,7 +595,7 @@ describe('split-pane component', () => {
           .greaterThan(0)
           .lessThan(wholeInitialSize);
 
-        return moveSplitter(0, size, type)
+        return moveSplitter(splitPane, 0, size, type)
           .wait(10)
           .then(ensurePanesAreResized(splitPane, type))
           .then(() => {
@@ -601,7 +603,7 @@ describe('split-pane component', () => {
             expect(wholeNewSize).eq(wholeInitialSize);
           })
           .then(() => {
-            moveSplitter(1, size * 2, type)
+            moveSplitter(splitPane, 1, size * 2, type)
               .wait(10)
               .then(ensurePanesAreResized(splitPane, type))
               .then(() => {
