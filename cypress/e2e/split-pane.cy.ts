@@ -366,6 +366,59 @@ describe('split-pane component', () => {
         splitPane.removePane(splitPane.length - 1);
       });
     });
+    
+    it('inserts splitters', () => {
+      cy
+        .document().then(removeAllSplitPanes)
+        .document().then(document => {
+
+          let splitPaneH;
+          let splitPaneV; 
+          
+          splitPaneH = createSplitPane('horizontal', 2)
+          splitPaneV = createSplitPane('vertical', 3);
+
+          // adding pane before mounting
+          splitPaneH.addPane(splitPaneV, 1);
+          document.body.appendChild(splitPaneH);
+
+          expect(
+            Array
+              .from(splitPaneH.children)
+              .filter(el => el.classList.contains('sp-splitter')).length,
+          ).eq(2);
+          
+          expect(
+            Array
+              .from(splitPaneV.children)
+              .filter(el => el.classList.contains('sp-splitter')).length,
+          ).eq(2);
+
+          removeAllSplitPanes(document);
+          
+          splitPaneH = createSplitPane('horizontal', 2)
+          splitPaneV = createSplitPane('vertical', 3);
+
+          // adding pane after mounting
+          document.body.appendChild(splitPaneH);
+          splitPaneH.addPane(splitPaneV, 1);
+
+          expect(
+            Array
+              .from(splitPaneH.children)
+              .filter(el => el.classList.contains('sp-splitter')).length,
+          ).eq(2);
+          
+          expect(
+            Array
+              .from(splitPaneV.children)
+              .filter(el => el.classList.contains('sp-splitter')).length,
+          ).eq(2);
+
+          removeAllSplitPanes(document);
+        });
+    });
+
   });
 
   describe('events', () => {
