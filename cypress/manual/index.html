@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Manual test</title>
+    <meta name="description" content="Manual test for the component">
+    <style>
+      body {
+        height: 100vh;
+      }
+      split-pane {
+        width: 100%;
+        height: 100%;
+      }
+      .pane {
+        color: white;
+        background-color: #2e3440;
+      }
+      .sp-splitter {
+        background-color: #3d434f;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import '../../src/index.ts';
+    </script>
+    <split-pane type="horizontal">
+      <div class="pane">Pane 1</div>
+      <split-pane type="vertical">
+        <div class="pane">Pane 2</div>
+        <div class="pane">Pane 3</div>
+      </split-pane>
+      <div class="pane">Pane 4</div>
+    </split-pane>
+  </body>
+</html>
