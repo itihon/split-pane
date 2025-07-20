@@ -6,12 +6,12 @@ const visitLocalhost = () => {
   cy.visit('localhost:5173');
 };
 
-function createSplitPane(direction: SplitPaneOrientationType, panesCount: number):SplitPane {
+function createSplitPane(direction: SplitPaneOrientationType, panesCount: number, options = { width: '900px', height: '600px' }):SplitPane {
 
   const splitPane = new SplitPane(direction);
 
-  splitPane.style.width = '900px';
-  splitPane.style.height = '600px';
+  splitPane.style.width = options.width;
+  splitPane.style.height = options.height;
 
   splitPane.append(
     ...Array
