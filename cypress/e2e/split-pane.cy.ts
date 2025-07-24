@@ -33,6 +33,7 @@ const removeAllSplitPanes = (document: Document) =>
     .forEach(splitPane => splitPane.remove());
 
 describe('split-pane component', () => {
+  before(visitLocalhost);
 
   describe('API', () => {
     before(() => {
