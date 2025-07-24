@@ -1,7 +1,7 @@
 # split-pane
 [![License][]](https://opensource.org/licenses/ISC)
 [![Build Status]](https://github.com/itihon/split-pane/actions/workflows/code-quality-and-test.yml)
-[![NPM Package]](https://npmjs.org/package/split-pane)
+[![NPM Package]](https://npmjs.org/package/@itihon/split-pane)
 [![Code Coverage]](https://codecov.io/gh/itihon/split-pane)
 [![semantic-release]](https://github.com/semantic-release/semantic-release)
 
@@ -78,7 +78,7 @@ const splitPane = document.getElementById('split-pane-1');
 #### API 
 
 ```ts
-export default class SplitPane extends HTMLElement {
+class SplitPane extends HTMLElement {
   get length(): number;
   getPane(idx: number): HTMLElement | null;
   getAllPanes(): NodeListOf<HTMLElement>;
