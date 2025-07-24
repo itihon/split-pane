@@ -1,6 +1,5 @@
 import SplitPane from '../../src/index';
 import type { SplitPaneOrientationType } from '../../src/SplitPane';
-import SplitPaneStateChangeEvent from '../../src/SplitPaneStateChangeEvent';
 
 const visitLocalhost = () => {
   cy.visit('localhost:5173');
@@ -436,7 +435,7 @@ describe('split-pane component', () => {
         const panes = splitPane.getAllPanes();
 
         splitPane.addEventListener('statechange', (event) => {
-          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+          const { oldState, newState, kind } = event.detail;
 
           expect(kind).eq('addpane');
 
@@ -464,7 +463,7 @@ describe('split-pane component', () => {
         const panes = splitPane.getAllPanes();
 
         splitPane.addEventListener('statechange', (event) => {
-          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+          const { oldState, newState, kind } = event.detail;
 
           expect(kind).eq('removepane');
 
@@ -492,7 +491,7 @@ describe('split-pane component', () => {
         const panes = splitPane.getAllPanes();
 
         splitPane.addEventListener('statechange', (event) => {
-          const { oldState, newState, kind } = event as SplitPaneStateChangeEvent;
+          const { oldState, newState, kind } = event.detail;
           
           const wholeWidth = splitPane.offsetWidth;
           const firstPaneWidth = panes[0].offsetWidth;

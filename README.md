@@ -91,14 +91,14 @@ export default class SplitPane extends HTMLElement {
 #### Events
 
 ```ts 
-export type SplitPaneState = {
-    gridTemplate: string;
-    panes: NodeListOf<HTMLElement>;
+type SplitPaneState = {
+  gridTemplate: string;
+  panes: NodeListOf<HTMLElement>;
 };
 
 type SplitPaneStateChangeKind = 'addpane' | 'removepane' | 'resizepane';
 
-export default class SplitPaneStateChangeEvent extends Event {
+interface SplitPaneStateChangeEventDetail {
   oldState: SplitPaneState;
   newState: SplitPaneState;
   kind: SplitPaneStateChangeKind;
@@ -113,7 +113,7 @@ const splitPane = new SplitPane();
 document.body.append(splitPane);
 
 splitPane.addEventListener('statechange', event => {
-  const { oldState, newState, kind, target } = event;
+  const { oldState, newState, kind } = event.detail;
   // ...
   // ...
 });

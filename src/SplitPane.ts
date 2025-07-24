@@ -1,9 +1,26 @@
 import GridTemplate from './GridTemplate';
-import SplitPaneStateChangeEvent from './SplitPaneStateChangeEvent';
-import type { SplitPaneState } from './SplitPaneStateChangeEvent';
 import './style.css';
 
 export type SplitPaneOrientationType = 'horizontal' | 'vertical';
+
+export type SplitPaneState = {
+  gridTemplate: string;
+  panes: NodeListOf<HTMLElement>;
+};
+
+export type SplitPaneStateChangeKind = 'addpane' | 'removepane' | 'resizepane';
+
+export interface SplitPaneStateChangeEventDetail {
+  oldState: SplitPaneState;
+  newState: SplitPaneState;
+  kind: SplitPaneStateChangeKind;
+}
+
+declare global {
+  interface HTMLElementEventMap {
+    statechange: CustomEvent<SplitPaneStateChangeEventDetail>;
+  }
+}
 
 class Splitter extends HTMLDivElement {
   constructor() {
@@ -80,7 +97,13 @@ export default class SplitPane extends HTMLElement {
       this.style.setProperty('--grid-template', this.gridTemplate.build());
 
       this.dispatchEvent(
-        new SplitPaneStateChangeEvent('resizepane', oldState, this.getState()),
+        new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+          detail: {
+            kind: 'resizepane',
+            oldState,
+            newState: this.getState(),
+          },
+        }),
       );
     }
   };
@@ -213,7 +236,13 @@ export default class SplitPane extends HTMLElement {
     }
 
     this.dispatchEvent(
-      new SplitPaneStateChangeEvent('addpane', oldState, this.getState()),
+      new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+        detail: {
+          kind: 'addpane',
+          oldState,
+          newState: this.getState(),
+        },
+      }),
     );
   }
 
@@ -250,7 +279,13 @@ export default class SplitPane extends HTMLElement {
       pane.remove();
 
       this.dispatchEvent(
-        new SplitPaneStateChangeEvent('removepane', oldState, this.getState()),
+        new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+          detail: {
+            kind: 'removepane',
+            oldState,
+            newState: this.getState(),
+          },
+        }),
       );
 
       return true;
