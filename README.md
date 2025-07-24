@@ -1,5 +1,5 @@
 # split-pane
-[![License][]](https://opensource.org/licenses/ISC)
+[![License][]](https://opensource.org/licenses/MIT)
 [![Build Status]](https://github.com/itihon/split-pane/actions/workflows/code-quality-and-test.yml)
 [![NPM Package]](https://npmjs.org/package/@itihon/split-pane)
 [![Code Coverage]](https://codecov.io/gh/itihon/split-pane)
