@@ -23,9 +23,16 @@ declare global {
 }
 
 class Splitter extends HTMLDivElement {
+  private static identifier = Symbol('Splitter');
+
+  static is(element: EventTarget | null): element is Splitter {
+    return element !== null && Object.hasOwn(element, this.identifier);
+  }
+
   constructor() {
     super();
     this.classList.add('sp-splitter');
+    Object.defineProperty(this, Splitter.identifier, { value: 'Splitter' });
   }
 }
 
@@ -140,9 +147,9 @@ export default class SplitPane extends HTMLElement {
         const nextChildElement = children[idx + 1];
 
         if (
-          !(childElement instanceof Splitter) &&
+          !Splitter.is(childElement) &&
           nextChildElement &&
-          !(nextChildElement instanceof Splitter)
+          !Splitter.is(nextChildElement)
         ) {
           const splitter = new Splitter();
           childElement.insertAdjacentElement('afterend', splitter);
@@ -153,7 +160,7 @@ export default class SplitPane extends HTMLElement {
     this.style.setProperty('--grid-template', this.gridTemplate.build());
 
     this.addEventListener('pointerdown', (e) => {
-      if (e.target instanceof Splitter) {
+      if (Splitter.is(e.target)) {
         e.preventDefault();
         e.stopPropagation();
         this.setPointerCapture(e.pointerId);
