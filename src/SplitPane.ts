@@ -105,6 +105,7 @@ export default class SplitPane extends HTMLElement {
 
       this.dispatchEvent(
         new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+          bubbles: true,
           detail: {
             kind: 'resizepane',
             oldState,
@@ -244,6 +245,7 @@ export default class SplitPane extends HTMLElement {
 
     this.dispatchEvent(
       new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+        bubbles: true,
         detail: {
           kind: 'addpane',
           oldState,
@@ -287,6 +289,7 @@ export default class SplitPane extends HTMLElement {
 
       this.dispatchEvent(
         new CustomEvent<SplitPaneStateChangeEventDetail>('statechange', {
+          bubbles: true,
           detail: {
             kind: 'removepane',
             oldState,

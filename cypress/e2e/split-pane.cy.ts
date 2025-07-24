@@ -516,26 +516,48 @@ describe('split-pane component', () => {
     });
     
     it('should fire state change event on resize', () => {
+      visitLocalhost();
+
       cy.document().then(removeAllSplitPanes);
 
       cy.document().then(document => {
-        const splitPane = createSplitPane('horizontal', 3);
-        document.body.appendChild(splitPane);
+        const splitPaneH = createSplitPane('horizontal', 2);
+        const splitPaneV = createSplitPane('vertical', 3, { width: '100%', height: '100%'});
+        splitPaneH.addPane(splitPaneV, 1);
+        document.body.appendChild(splitPaneH);
       });
 
       cy.get('split-pane').then(res => {
         const splitPane = res[0] as SplitPane;
-        const panes = splitPane.getAllPanes();
+
+        let listenerCallsCount = 0;
 
         splitPane.addEventListener('statechange', (event) => {
           const { oldState, newState, kind } = event.detail;
-          
-          const wholeWidth = splitPane.offsetWidth;
-          const firstPaneWidth = panes[0].offsetWidth;
-          const secondPaneWidth = panes[1].offsetWidth;
+          const target = event.target as SplitPane;
+          const panes = target.getAllPanes();
 
-          const firstPanePercentage = firstPaneWidth / wholeWidth * 100;
-          const secondPanePercentage = secondPaneWidth / wholeWidth * 100;
+          let measureName: 'offsetWidth' | 'offsetHeight' | '' = '';
+          const type = target.getAttribute('type') as SplitPaneOrientationType;
+
+          if (type === 'horizontal') {
+            measureName = 'offsetWidth';
+          }
+
+          if (type === 'vertical') {
+            measureName = 'offsetHeight';
+          }
+
+          if (!measureName) {
+            throw new Error('SplitPane must have the attribute "type"');
+          }
+          
+          const wholeSize = splitPane[measureName];
+          const firstPaneSize = panes[0][measureName];
+          const secondPaneSize = panes[1][measureName];
+
+          const firstPanePercentage = firstPaneSize / wholeSize * 100;
+          const secondPanePercentage = secondPaneSize / wholeSize * 100;
 
           expect(kind).eq('resizepane');
 
@@ -544,6 +566,8 @@ describe('split-pane component', () => {
 
           expect([...oldState.panes]).deep.eq([...panes]);
           expect([...newState.panes]).deep.eq([...panes]);
+
+          listenerCallsCount++;
         });
 
         cy
@@ -552,7 +576,18 @@ describe('split-pane component', () => {
         .first()
         .trigger('pointerdown', { pointerId: 1, offsetX: 0, force: true })
         .trigger('pointermove', { pointerId:1, offsetX: 150, force: true })
-        .trigger('pointerup', { pointerId: 1, offsetX: 150, force: true });
+        .trigger('pointerup', { pointerId: 1, offsetX: 150, force: true })
+        .wait(10)
+        .get('split-pane[type=vertical]')
+        .find('.sp-splitter')
+        .first()
+        .trigger('pointerdown', { pointerId: 1, offsetY: 0, force: true })
+        .trigger('pointermove', { pointerId:1, offsetY: 20, force: true })
+        .trigger('pointerup', { pointerId: 1, offsetY: 20, force: true })
+         .wait(10)
+         .then(() => {
+           expect(listenerCallsCount).eq(2);
+         });
       });
     });
   });
