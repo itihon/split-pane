@@ -139,7 +139,7 @@ export default class SplitPane extends HTMLElement {
     this.gridTemplate.parse(property);
 
     [...this.children].forEach((childElement, idx, children) => {
-      if (!this.gridTemplate.get(idx)) {
+      if (!this.gridTemplate.get(idx) && !Splitter.is(childElement)) {
         this.gridTemplate.add(idx);
       }
 

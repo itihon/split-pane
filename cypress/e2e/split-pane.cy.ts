@@ -283,6 +283,42 @@ describe('split-pane component', () => {
     it('tests addPane method', () => {
       cy.document().then(removeAllSplitPanes);
 
+      // addPane() then mount
+      cy.document().then(document => {
+        const splitPaneH = createSplitPane('horizontal', 2);
+        const splitPaneV = createSplitPane('vertical', 3, { width: '100%', height: '100%'});
+        splitPaneH.addPane(splitPaneV, 1);
+        document.body.appendChild(splitPaneH);
+
+        expect(splitPaneH.length).eq(3);
+        expect(splitPaneH.style.getPropertyValue('--grid-template'))
+          .eq('1fr min-content 1fr min-content 1fr');
+
+        cy
+          .get('split-pane[type=horizontal] > .sp-splitter')
+          .should('have.length', 2);
+      });
+      
+      cy.document().then(removeAllSplitPanes);
+
+      // mount then addPane()
+      cy.document().then(document => {
+        const splitPaneH = createSplitPane('horizontal', 2);
+        const splitPaneV = createSplitPane('vertical', 3, { width: '100%', height: '100%'});
+        document.body.appendChild(splitPaneH);
+        splitPaneH.addPane(splitPaneV, 1);
+
+        expect(splitPaneH.length).eq(3);
+        expect(splitPaneH.style.getPropertyValue('--grid-template'))
+          .eq('1fr min-content 1fr min-content 1fr');
+
+        cy
+          .get('split-pane[type=horizontal] > .sp-splitter')
+          .should('have.length', 2);
+      });
+
+      cy.document().then(removeAllSplitPanes);
+
       cy.document().then(document => {
         let splitPane;
         
